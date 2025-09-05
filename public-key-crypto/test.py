@@ -3,7 +3,7 @@
 
 import unittest
 
-from P2023_Practica3_Skeleton import *
+from solution import *
 
 
 

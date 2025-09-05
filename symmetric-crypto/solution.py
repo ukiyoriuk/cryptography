@@ -325,10 +325,21 @@ def uoc_collision(prefix):
     """
     Generates collisions for uoc_mmo_hash, with messages having a given prefix.
 
-    :param prefix: string, prefix for the messages
-    :return: 2-element tuple, with the two strings that start with prefix and have the same hash.
+    Strategy:
+    Because the hash uses naive zero padding (no length encoding), messages that differ
+    only by trailing zero bytes collapse to the same padded bitstring. We build:
+      m1 = prefix + 'A' * k
+      m2 = m1 + '\x00'
+    choosing k so that len(m1) % 16 != 15 (16 bytes = 128-bit block).
     """
+    # Ensure m1 does not land at length % 16 == 15
+    k = 1
+    if (len(prefix) + k) % 16 == 15:
+        k = 2  # skip the problematic boundary
 
-    collision = ("", "")
+    m1 = prefix + ("A" * k)        # any non-zero byte(s) work
+    m2 = m1 + "\x00"               # explicit zero byte appended
 
-    return collision
+    # Sanity: they must differ and share the prefix
+    assert m1 != m2 and m1.startswith(prefix) and m2.startswith(prefix)
+    return (m1, m2)

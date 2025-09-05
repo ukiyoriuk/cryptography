@@ -3,7 +3,7 @@
 
 import unittest
 
-from P2023_Practica1_Skeleton import *
+from solution import *
 
 
 def assert_grille(obj, key, ct, pt):
